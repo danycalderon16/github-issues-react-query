@@ -1,7 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
-import { githubApi } from "../api/githubApi";
-import { Label } from "../issues/components/interfaces/label";
-import { sleep } from "../helpers/sleep";
+import { githubApi } from "../../api/githubApi";
+import { Label } from "../interfaces/label";
+import { sleep } from "../../helpers/sleep";
 
 const getLabels = async (): Promise<Label[]> => {
   await sleep(2);
@@ -14,7 +14,7 @@ export const useLabels = () => {
   const labelQuery = useQuery({
     queryKey: ["labels"],
     queryFn: getLabels,
-    // staleTime:1000*60*60,
+    staleTime:1000*60*60,
     // initialData:[
     //   {
     //     id: 791921801,
