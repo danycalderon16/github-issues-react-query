@@ -1,17 +1,46 @@
+import { useQueryClient } from "@tanstack/react-query";
+import { useNavigate } from "react-router-dom";
 import { FiInfo, FiMessageSquare, FiCheckCircle } from "react-icons/fi";
 import { Issue, State } from "../interfaces";
-import { useNavigate } from "react-router-dom";
+import { getIssueComments, getIssueInfo } from "../hooks/useIssue";
+import { timeSince } from "../../helpers";
 
 interface IssueItemProps {
   issue: Issue;
 }
 
 export const IssueItem: React.FC<IssueItemProps> = ({ issue }) => {
-  const navigate = useNavigate()
+  const navigate = useNavigate();
+  const queryClient = useQueryClient();
+
+  const prefetchData = () => {
+    queryClient.prefetchQuery({
+      queryKey: ["issue", issue.number],
+      queryFn: () => getIssueInfo(issue.number),
+    });
+
+    queryClient.prefetchQuery({
+      queryKey: ["issue", issue.number, "comments"],
+      queryFn: () => getIssueComments(issue.number)
+    });
+  }
+
+  const preSetData = () => {
+    queryClient.setQueryData(
+     ["issue", issue.number,],
+      issue,
+      {
+        updatedAt: new Date().getTime() +500
+      }
+    );
+  }
 
   return (
     <div className="card mb-2 issue"
-      onClick={()=> navigate(`/issues/issue/${issue.number}`)}>
+      onClick={()=> navigate(`/issues/issue/${issue.number}`)}
+      // onMouseEnter={prefetchData}
+      onMouseEnter={preSetData}
+      >
       <div className="card-body d-flex align-items-center">
         {
           issue.state === State.Open ? 
@@ -23,9 +52,17 @@ export const IssueItem: React.FC<IssueItemProps> = ({ issue }) => {
             {issue.title}
           </span>
           <span className="issue-subinfo">
-            {issue.number} opened 2 days ago by{" "}
+            {issue.number} opened {timeSince(issue.created_at)} ago by{" "}
             <span className="fw-bold">{issue.user.login}</span>
           </span>
+          <div>
+            {
+              issue.labels.map(label => (
+                <span key={label.id} className="badge rounded-pill m-1"
+                style={{backgroundColor: `#${label.color}`, color:"black"}}>{label.name}</span>
+              ))
+            }
+          </div>
         </div>
 
         <div className="d-flex align-items-center">
