@@ -28,6 +28,11 @@ export const ListView = () => {
           onStateChange={(newState?:State) => setState(newState)}
            />
         )}
+      <div className="d-flex mt-4 justify-content-between align-items-center">
+        <button className="btn btn-outline-primary" >Prev</button>
+        <span>123</span>
+        <button className="btn btn-outline-primary" >Next</button>
+      </div>
       </div>
 
       <div className="col-4">
